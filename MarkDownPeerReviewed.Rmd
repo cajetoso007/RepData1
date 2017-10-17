@@ -1,0 +1,114 @@
+Opening up the directory on my computer for this file:
+```{r, echo= TRUE}
+setwd("C:/Users/Manuel/Desktop/Coursera")
+datafile <- read.csv("./repdata/activity.csv")
+
+head(datafile)
+summary(datafile)
+
+```
+
+What is the mean of steps taken per day?
+
+```{r, echo = TRUE}
+
+#Getting the mean
+#Fist: Add the number of steps per day
+TotalSteps <- aggregate(steps ~ date, datafile, FUN = sum)
+summary(TotalSteps)
+
+#Make the histogram:
+hist(TotalSteps$steps, xlab = " steps", ylab = "frequency", col = "red")
+
+#Getting the mean:
+
+StepsMean<- mean(TotalSteps$steps, na.rm = "TRUE")
+StepsMedian <- median(TotalSteps$steps, na.rm = "TRUE")
+
+#Printing the values for mean and median:
+StepsMean
+StepsMedian
+
+
+```
+Next: Making a time series plot
+
+```{r , echo = TRUE}
+
+#Getting the average number of steps in a 5min interval:
+AvgSteps <- aggregate(steps ~ interval , datafile , FUN = mean)
+summary(AvgSteps)
+head(AvgSteps)
+
+
+#Making the plot:
+plot(AvgSteps$interval, AvgSteps$steps, type = "l", col = "red", xlab = "Interval" , ylab = "Avg Steps", main = "Average Number Steps Per 5-min Interval")
+
+#Finding which 5 min interval has the most number of steps taken:
+MostSteps <- which.max(AvgSteps$steps)
+MostSteps   #This returns the number of the list, which is interval 835 , which has ~209 steps
+
+#A more refined approach to getting the interval with the most steps is below:
+maxInt <- AvgSteps[which.max(AvgSteps$steps),]
+maxInt
+```
+
+Finding and Replacing the Missing Data
+
+```{r, echo = TRUE}
+
+#Total number of missing values is: 
+sum(is.na(datafile[,1]))
+
+
+#Replacing the missing data with Average in 5 min interval
+missing <- !complete.cases(datafile)
+REMNA <- datafile[missing == TRUE,]
+REMNA[,1] <- AvgSteps$steps
+
+summary(REMNA) #Shows no NA values
+
+#Making a newFile with replaced data
+datafile1 <- rbind(datafile[complete.cases(datafile),], REMNA)
+
+#Getting the New Average with NA values filled in
+NewSum <- aggregate(steps ~ date, datafile1, FUN = sum, na.rm = TRUE)
+
+summary(NewSum)
+
+#Making a histogram of total number of steps in new file
+hist(NewSum$steps, xlab = " steps", col = "red")
+
+
+
+```
+
+Capturing the Diferrence between Weekend and Weekday activity
+```{r, echo = TRUE}
+
+#labeling Weekdays and weekends appropropiately
+DayLabel <- function(date) {
+  day <- weekdays(date)
+  if (day %in% c('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'))
+      return ("weekeday")
+  else if (day %in% c('Saturday', 'Sunday'))
+      return ("weekend")
+  else
+      stop ("Invalid Date Format.")
+}
+
+datafile1$date <- as.Date(datafile1$date)
+datafile1$day <- sapply(datafile1$date, FUN = DayLabel)
+
+```
+
+Plotting the Data
+```{r, echo = TRUE}
+Label_Days_Mean <- aggregate(steps ~ interval + day, datafile1,  mean)
+
+head(Label_Days_Mean)
+
+#Plotting the Data
+library(lattice)
+xyplot(steps ~ interval | day, data = Label_Day_Means, type = "l", xlab = "Interval", 
+    ylab = "Number of steps", layout = c(1, 2))
