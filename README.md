@@ -1,5 +1,8 @@
 # RepData1
 Introduction
+Quick Update: I didn't know how to submit an md file. So, I created a pdf file format by exporting the originial Rmd file as a Word.doc and using Microsoft Office to ceate a pdf format of the output that contains the graphs.
+I am using version 3.4.1 of Rstudio, so md files are hard to create and pandoc package cannot be install. Hence, I can only knitr html or Word.doc files.
+
 
 It is now possible to collect a large amount of data about personal movement using activity monitoring devices such as a Fitbit, Nike Fuelband, or Jawbone Up. These type of devices are part of the “quantified self” movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. But these data remain under-utilized both because the raw data are hard to obtain and there is a lack of statistical methods and software for processing and interpreting the data.
 
